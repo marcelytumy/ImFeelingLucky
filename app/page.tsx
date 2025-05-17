@@ -24,7 +24,7 @@ export default function HomePage() {
 
   useEffect(() => {
     // Fetch the websites from the public directory
-    fetch('/data/websites.txt')
+    fetch('https://raw.githubusercontent.com/marcelytumy/ImFeelingLucky/refs/heads/main/public/data/websites.txt')
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to load websites');
