@@ -1,7 +1,14 @@
 {
   "name": "imfeelinglucky",
-  "private": true,
-  "version": "0.0.0",
+  "private": false,
+  "author": "Marcel Schreiber",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcelytumy/imfeelinglucky.git"
+  },
+  "version": "1.0.0",
+  "homepage": "https://marcelytumy.github.io/imfeelinglucky",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,10 +16,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "preact": "^10.26.5"
+    "@tailwindcss/vite": "^4.1.7",
+    "canvas-confetti": "^1.9.3",
+    "lucide-preact": "^0.511.0",
+    "preact": "^10.26.5",
+    "tailwindcss": "^4.1.7"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.1",
+    "@types/canvas-confetti": "^1.9.0",
     "typescript": "~5.8.3",
     "vite": "^6.3.5"
   }
