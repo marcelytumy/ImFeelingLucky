@@ -1,12 +1,18 @@
-/// <reference types="preact/jsx-runtime" />
-import { useEffect, useState } from 'preact/hooks';
-import { Wheel } from './Wheel';
-import { Github } from 'lucide-preact';
+// app/page.tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Github } from 'lucide-react';
+import Wheel from '@/components/Wheel';
 
 // Data for selected site in modal
-interface ModalData { title: string; link: string; favicon?: string; }
+interface ModalData {
+  title: string;
+  link: string;
+  favicon?: string;
+}
 
-export function App() {
+export default function HomePage() {
   const [websites, setWebsites] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -14,10 +20,10 @@ export function App() {
   const [modalData, setModalData] = useState<ModalData | null>(null);
   // State for favicon loading
   const [faviconLoading, setFaviconLoading] = useState(false);
-  const [faviconError, setFaviconError] = useState(false); // New state for favicon error
+  const [faviconError, setFaviconError] = useState(false);
 
   useEffect(() => {
-    // Fetch the websites from the text file
+    // Fetch the websites from the public directory
     fetch('/data/websites.txt')
       .then(response => {
         if (!response.ok) {
@@ -39,6 +45,9 @@ export function App() {
       });
   }, []);
 
+  /**
+   * Navigate to a random website from the websites list
+   */
   function randomPage() {
     if (websites.length === 0) {
       alert('No websites available!');
@@ -58,6 +67,38 @@ export function App() {
     window.open(url, '_blank', 'noopener,noreferrer');
   }
 
+  /**
+   * Get a display title for a domain
+   */
+  function getDisplayTitleForDomain(domain: string, site: string): string {
+    // Check for special cases first
+    if (domain.includes('google')) return 'Google';
+    if (domain.includes('wikipedia')) return 'Wikipedia';
+    if (domain.includes('youtube')) return 'YouTube';
+    if (domain.includes('facebook')) return 'Facebook';
+    if (domain.includes('twitter') || domain.includes('x.com')) return 'Twitter/X';
+    if (domain.includes('instagram')) return 'Instagram';
+    if (domain.includes('amazon')) return 'Amazon';
+    if (domain.includes('github')) return 'GitHub';
+    if (domain.includes('linkedin')) return 'LinkedIn';
+    if (domain.includes('netflix')) return 'Netflix';
+    if (domain.includes('reddit')) return 'Reddit';
+    
+    // Special personal sites
+    if (site === 'marcelschreiber.de') return 'Marcel Schreiber';
+    if (site.includes('palettelab')) return 'Palette Lab';
+    if (site.includes('imageconvert')) return 'ImageConvert';
+    if (site.includes('videocompress')) return 'VideoCompress';
+    
+    // Default processing for other domains
+    return domain
+      .replace(/^www\./, '')
+      .split('.')[0]
+      .split('-')
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+  }
+
   // Handle selection from wheel
   function handleSpinSelect(site: string) {
     const url = site.startsWith('http') ? site : `https://${site}`;
@@ -73,37 +114,7 @@ export function App() {
         faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
         canLoadFavicon = true;
         
-        // Check for special cases first
-        if (domain.includes('google')) {
-          displayTitle = 'Google';
-        } else if (domain.includes('wikipedia')) {
-          displayTitle = 'Wikipedia';
-        } else if (domain.includes('youtube')) {
-          displayTitle = 'YouTube';
-        } else if (domain.includes('facebook')) {
-          displayTitle = 'Facebook';
-        } else if (domain.includes('twitter') || domain.includes('x.com')) {
-          displayTitle = 'Twitter/X';
-        } else if (domain.includes('instagram')) {
-          displayTitle = 'Instagram';
-        } else if (domain.includes('amazon')) {
-          displayTitle = 'Amazon';
-        } else if (domain.includes('github')) {
-          displayTitle = 'GitHub';
-        } else if (domain.includes('linkedin')) {
-          displayTitle = 'LinkedIn';
-        } else if (domain.includes('netflix')) {
-          displayTitle = 'Netflix';
-        } else if (domain.includes('reddit')) {
-          displayTitle = 'Reddit';
-        } else {
-          // Default processing for other domains
-          displayTitle = domain.replace(/^www\./, '');
-          displayTitle = displayTitle.split('.')[0] 
-        .split('-')
-        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-        .join(' ');
-        }
+        displayTitle = getDisplayTitleForDomain(domain, site);
       } else {
         displayTitle = site; 
       }
@@ -112,11 +123,7 @@ export function App() {
       displayTitle = site; 
     }
     
-    if (canLoadFavicon) {
-      setFaviconLoading(true);
-    } else {
-      setFaviconLoading(false); 
-    }
+    setFaviconLoading(canLoadFavicon);
     setFaviconError(false); 
     
     setModalData({ 
@@ -144,7 +151,7 @@ export function App() {
   }
 
   // Close modal on backdrop click
-  function handleBackdropClick(event: preact.JSX.TargetedMouseEvent<HTMLDivElement>) {
+  function handleBackdropClick(event: React.MouseEvent<HTMLDivElement>) {
     if (event.target === event.currentTarget) {
       closeModal();
     }
@@ -191,18 +198,17 @@ export function App() {
               >
                 <div 
                   className="bg-white dark:bg-gray-800 p-6 pt-10 sm:p-8 sm:pt-12 rounded-lg shadow-2xl text-center max-w-sm sm:max-w-md w-full relative"
-                  onClick={(e) => e.stopPropagation()} // Prevent click from bubbling to backdrop
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <button
                     onClick={closeModal}
                     className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
                     aria-label="Close modal"
                   >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                   </button>
                   
-                  <div className="mx-auto mb-5 w-20 h-20 flex items-center justify-center border dark:border-gray-700 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700">
-                    {/* Render img tag if a favicon URL exists. It will be hidden by CSS if loading or error, and shown on success. */}
+                  <div className="mx-auto mb-5 w-20 h-20 flex items-center justify-center overflow-hidden">
                     {modalData.favicon && (
                       <img 
                         src={modalData.favicon} 
@@ -214,19 +220,14 @@ export function App() {
                       />
                     )}
 
-                    {/* Show spinner only when actively loading and a favicon is expected */}
                     {faviconLoading && modalData.favicon && (
                       <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent border-dashed rounded-full animate-spin"></div>
                     )}
 
-                    {/* Show fallback SVG if:
-                        1. Not loading, but there was an error (and we attempted to load a favicon).
-                        2. Or, if there's no favicon URL to even attempt loading (and not currently in a loading state for it).
-                    */}
                     {((!faviconLoading && faviconError && modalData.favicon) || 
                       (!modalData.favicon && !faviconLoading)) && (
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-10 h-10 text-gray-400 dark:text-gray-500">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21.75 12H17.25" />
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-10 h-10 text-gray-400 dark:text-gray-500">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21.75 12H17.25" />
                       </svg>
                     )}
                   </div>
@@ -242,7 +243,6 @@ export function App() {
                         if (modalData?.link) {
                           window.open(modalData.link, '_blank', 'noopener,noreferrer');
                         }
-                        // Optionally close modal: closeModal(); 
                       }}
                       className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                     >
