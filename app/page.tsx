@@ -76,7 +76,7 @@ export default function HomePage() {
     if (domain.includes('wikipedia')) return 'Wikipedia';
     if (domain.includes('youtube')) return 'YouTube';
     if (domain.includes('facebook')) return 'Facebook';
-    if (domain.includes('twitter') || domain.includes('x.com')) return 'Twitter/X';
+    if (domain.includes('twitter') || site == 'x.com') return 'Twitter/X';
     if (domain.includes('instagram')) return 'Instagram';
     if (domain.includes('amazon')) return 'Amazon';
     if (domain.includes('github')) return 'GitHub';
